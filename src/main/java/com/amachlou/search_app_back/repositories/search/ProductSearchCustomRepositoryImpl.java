@@ -3,6 +3,7 @@ package com.amachlou.search_app_back.repositories.search;
 import com.amachlou.search_app_back.entities.ProductDocument;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.elasticsearch.client.elc.NativeQuery;
+import org.springframework.data.elasticsearch.client.elc.NativeQueryBuilder;
 import org.springframework.data.elasticsearch.core.ElasticsearchOperations;
 import org.springframework.data.elasticsearch.core.SearchHit;
 import org.springframework.data.elasticsearch.core.SearchHits;
@@ -76,7 +77,7 @@ public class ProductSearchCustomRepositoryImpl implements ProductSearchCustomRep
                         )
                 )
                 .withSourceFilter(new FetchSourceFilter(
-                        true, new String[] {"name", "description", "price"}, null
+                        true, new String[] {"name", "description"}, null
                 ))
                 .withMaxResults(100)
                 .build();
@@ -87,4 +88,21 @@ public class ProductSearchCustomRepositoryImpl implements ProductSearchCustomRep
                 .map(hit -> hit.getContent())
                 .toList();
     }
+
+    @Override
+    public List<Long> fetchAllElasticIds() {
+        NativeQuery query = new NativeQueryBuilder()
+                .withFields()
+                .build();
+
+        SearchHits<ProductDocument> hits = elasticsearchOperations.search(query, ProductDocument.class);
+
+        return hits.getSearchHits()
+                .stream()
+                .map(SearchHit::getId)
+                .map(Long::valueOf)
+                .toList();
+    }
+
+
 }

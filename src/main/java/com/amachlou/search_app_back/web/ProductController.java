@@ -5,6 +5,7 @@ import com.amachlou.search_app_back.entities.ProductDocument;
 import com.amachlou.search_app_back.repositories.elastic.ProductSearchRepository;
 import com.amachlou.search_app_back.repositories.jpa.ProductRepository;
 import com.amachlou.search_app_back.repositories.search.ProductSearchCustomRepository;
+import com.amachlou.search_app_back.services.ProductService;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,14 +22,16 @@ public class ProductController {
     private final ProductRepository productRepository;
     private final ProductSearchRepository productSearchRepository;
     private final ProductSearchCustomRepository productSearchCustomRepository;
+    private final ProductService productService;
 
     public ProductController(ProductRepository productRepository,
                              ProductSearchRepository productSearchRepository,
-                             ProductSearchCustomRepository productSearchCustomRepository) {
+                             ProductSearchCustomRepository productSearchCustomRepository, ProductService productService) {
 
         this.productRepository = productRepository;
         this.productSearchRepository = productSearchRepository;
         this.productSearchCustomRepository = productSearchCustomRepository;
+        this.productService = productService;
     }
 
     // CREATE
@@ -85,5 +88,12 @@ public class ProductController {
     public ResponseEntity<List<ProductDocument>> searchProducts(@RequestParam(name = "q") String term) {
         List<ProductDocument> results = productSearchRepository.findByNameContainingOrDescriptionContaining(term, term);
         return ResponseEntity.ok(results);
+    }
+
+    // SEARCH throught ids
+    @GetMapping("/searchids")
+    public ResponseEntity<List<Product>> searchProductsThroughtIds(@RequestParam(name = "q") String term) {
+        List<Product> products = productService.getAllByTermThroughIds(term);
+        return ResponseEntity.ok(products);
     }
 }

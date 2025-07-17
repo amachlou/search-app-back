@@ -7,5 +7,7 @@ import java.util.List;
 public interface ProductSearchCustomRepository {
     List<ProductDocument> fullTextSearch(String query);
     List<ProductDocument> searchByTerm(String term);
+
+    List<Long> fetchAllElasticIds();
 }
 
